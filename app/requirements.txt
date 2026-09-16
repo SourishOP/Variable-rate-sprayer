@@ -1,0 +1,17 @@
+# Web demo UI backend
+flask>=3.0
+flask-cors>=4.0
+
+# Inference + severity (same as model/requirements.txt core)
+tensorflow>=2.16          # only needed for "model" mode; demo mode works without it
+numpy>=1.23
+pillow>=9.0
+opencv-python-headless>=4.7
+
+# Colab public URL (optional, for remote demo)
+pyngrok>=7.0
+
+# Optional: interactive leaf isolation via MobileSAM (box prompt).
+# If installed, drawing a box around the main leaf uses SAM to segment it.
+# The app falls back to the color leaf mask when this is absent.
+ultralytics>=8.1

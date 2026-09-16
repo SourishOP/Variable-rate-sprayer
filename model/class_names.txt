@@ -1,0 +1,6 @@
+Bacterial_Blight
+Blast
+Brown_Spot
+Healthy
+Leaf_Smut
+Neck_Blast
