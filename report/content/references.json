@@ -1,0 +1,92 @@
+[
+ {
+  "key": "abioye2024",
+  "intext": "Abioye et al., 2024",
+  "apa": "Abioye, A. E., Larbi, P. A., & Hadwan, A. A. K. (2024). Deep learning guided variable rate robotic sprayer prototype. Smart Agricultural Technology, 9, 100540. https://doi.org/10.1016/j.atech.2024.100540"
+ },
+ {
+  "key": "barbon2018",
+  "intext": "Barbon et al., 2018",
+  "apa": "Barbon, A. P. A. da C., Barbon Jr, S., Campos, G. F. C., Seixas Jr, J. L., Peres, L. M., Mastelini, S. M., Andreo, N., Ulrici, A., & Bridi, A. M. (2018). Development of a flexible computer vision system for marbling classification. Computers and Electronics in Agriculture, 142(A), 536 to 544. https://doi.org/10.1016/j.compag.2017.11.017"
+ },
+ {
+  "key": "campos2020",
+  "intext": "Campos et al., 2020",
+  "apa": "Campos, J., Llop, J., Gallart, M., Garcia-Ruiz, F., Gras, A., Salcedo, R., & Gil, E. (2020). Development of canopy vigour maps using UAV for site specific management during vineyard spraying process. Precision Agriculture, 21, 1136 to 1156. https://doi.org/10.1007/s11119-019-09694-2"
+ },
+ {
+  "key": "chen2020",
+  "intext": "Chen et al., 2020",
+  "apa": "Chen, J., Chen, J., Zhang, D., Sun, Y., & Nanehkaran, Y. A. (2020). Using deep transfer learning for image based plant disease identification. Computers and Electronics in Agriculture, 173, 105393. https://doi.org/10.1016/j.compag.2020.105393"
+ },
+ {
+  "key": "esau2013",
+  "intext": "Esau et al., 2013",
+  "apa": "Esau, T. J., Zaman, Q. U., Chang, Y. K., Schumann, A. W., Percival, D. C., & Farooque, A. A. (2013). Spot application of fungicide for wild blueberry using an automated prototype variable rate sprayer. Precision Agriculture, 15(2), 147 to 161. https://doi.org/10.1007/s11119-013-9319-4"
+ },
+ {
+  "key": "layton2020",
+  "intext": "Layton et al., 2020",
+  "apa": "Layton, A., Krogmeier, J. V., Ault, A., & Buckmaster, D. R. (2020). From yield history to productivity zone identification with hidden Markov random fields. Precision Agriculture, 21, 762 to 781. https://doi.org/10.1007/s11119-019-09694-2"
+ },
+ {
+  "key": "mohanty2016",
+  "intext": "Mohanty et al., 2016",
+  "apa": "Mohanty, S. P., Hughes, D. P., & Salathe, M. (2016). Using deep learning for image based plant disease detection. Frontiers in Plant Science, 7, 1419. https://doi.org/10.3389/fpls.2016.01419"
+ },
+ {
+  "key": "oberti2016",
+  "intext": "Oberti et al., 2016",
+  "apa": "Oberti, R., Marchi, M., Tirelli, P., Calcante, A., Iriti, M., Hocevar, M., Baur, J., Pfaff, J., Schutz, C., & Ulbrich, H. (2016). Selective spraying of grapevines for disease control using a modular agricultural robot. Biosystems Engineering, 146, 203 to 215. https://doi.org/10.1016/j.biosystemseng.2015.12.004"
+ },
+ {
+  "key": "partel2019",
+  "intext": "Partel et al., 2019",
+  "apa": "Partel, V., Kakarla, S. C., & Ampatzidis, Y. (2019). Development and evaluation of a low cost and smart technology for precision weed management utilizing artificial intelligence. Computers and Electronics in Agriculture, 157, 339 to 350. https://doi.org/10.1016/j.compag.2018.12.048"
+ },
+ {
+  "key": "petchiammal2023",
+  "intext": "Petchiammal et al., 2023",
+  "apa": "Petchiammal, A., Kiruba, B., Murugan, et al. (2023). Paddy doctor: A visual image dataset for automated paddy disease classification and benchmarking. Proceedings of the 10th ACM IKDD CODS and 28th COMAD (CODS COMAD 2023). https://doi.org/10.1145/3570991.3570994"
+ },
+ {
+  "key": "rahman2020",
+  "intext": "Rahman et al., 2020",
+  "apa": "Rahman, C. R., Arko, P. S., Ali, M. E., Khan, M. A. I., Apon, S. H., Nowrin, F., & Wasif, A. (2020). Identification and recognition of rice diseases and pests using convolutional neural networks. Biosystems Engineering, 194, 112 to 120. https://doi.org/10.1016/j.biosystemseng.2020.03.020"
+ },
+ {
+  "key": "rehman2019",
+  "intext": "Rehman et al., 2019",
+  "apa": "Rehman, T. U., Zaman, Q. U., Chang, Y. K., Schumann, A. W., & Corscadden, K. W. (2019). Development and field evaluation of a machine vision based in season weed detection system for wild blueberry. Computers and Electronics in Agriculture, 162, 1 to 13. https://doi.org/10.1016/j.compag.2019.03.023"
+ },
+ {
+  "key": "samseemoung2017",
+  "intext": "Samseemoung et al., 2017",
+  "apa": "Samseemoung, G., Soni, P., & Suwan, P. (2017). Development of a variable rate chemical sprayer for monitoring diseases and pests infestation in coconut plantations. Agriculture, 7(10), 89. https://doi.org/10.3390/agriculture7100089"
+ },
+ {
+  "key": "sethy2020",
+  "intext": "Sethy et al., 2020",
+  "apa": "Sethy, P. K., Barpanda, N. K., Rath, A. K., & Behera, S. K. (2020). Deep feature based rice leaf disease identification using support vector machine. Computers and Electronics in Agriculture, 175, 105527. https://doi.org/10.1016/j.compag.2020.105527"
+ },
+ {
+  "key": "tewari2020",
+  "intext": "Tewari et al., 2020",
+  "apa": "Tewari, V. K., Pareek, C. M., Lal, G., Dhruw, L. K., & Singh, N. (2020). Image processing based real time variable rate chemical spraying system for disease control in paddy crop. Artificial Intelligence in Agriculture, 4, 21 to 30. https://doi.org/10.1016/j.aiia.2020.01.002"
+ },
+ {
+  "key": "wei2024",
+  "intext": "Wei et al., 2024",
+  "apa": "Wei, T., et al. (2024). PlantSeg: A large scale in the wild dataset for plant disease segmentation. arXiv:2409.04038."
+ },
+ {
+  "key": "xu2018",
+  "intext": "Xu et al., 2018",
+  "apa": "Xu, Y., Gao, Z., Khot, L., Meng, X., & Zhang, Q. (2018). A real time weed mapping and precision herbicide spraying system for row crops. Sensors, 18(12), 4245. https://doi.org/10.3390/s18124245"
+ },
+ {
+  "key": "zhang2025",
+  "intext": "Zhang et al., 2025",
+  "apa": "Zhang, J., Chen, Y., Gu, C., Li, Z., Huang, J., Lv, X., Zhang, S., & Qiu, W. (2025). A variable rate spraying method fusing canopy volume and disease detection to reduce pesticide dosage. Computers and Electronics in Agriculture, 237, 110606. https://doi.org/10.1016/j.compag.2025.110606"
+ }
+]

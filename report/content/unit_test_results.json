@@ -1,0 +1,303 @@
+{
+ "total": 37,
+ "passed": 37,
+ "failed": 0,
+ "cases": [
+  {
+   "id": "U1.1",
+   "group": "Category mapping",
+   "description": "severity 0.0% maps to Healthy with base coefficient 0.00",
+   "expected": "Healthy/0.00",
+   "actual": "Healthy/0.00",
+   "passed": true
+  },
+  {
+   "id": "U1.2",
+   "group": "Category mapping",
+   "description": "severity 0.1% maps to Low with base coefficient 0.30",
+   "expected": "Low/0.30",
+   "actual": "Low/0.30",
+   "passed": true
+  },
+  {
+   "id": "U1.3",
+   "group": "Category mapping",
+   "description": "severity 5.0% maps to Low with base coefficient 0.30",
+   "expected": "Low/0.30",
+   "actual": "Low/0.30",
+   "passed": true
+  },
+  {
+   "id": "U1.4",
+   "group": "Category mapping",
+   "description": "severity 5.1% maps to Medium with base coefficient 0.55",
+   "expected": "Medium/0.55",
+   "actual": "Medium/0.55",
+   "passed": true
+  },
+  {
+   "id": "U1.5",
+   "group": "Category mapping",
+   "description": "severity 20.0% maps to Medium with base coefficient 0.55",
+   "expected": "Medium/0.55",
+   "actual": "Medium/0.55",
+   "passed": true
+  },
+  {
+   "id": "U1.6",
+   "group": "Category mapping",
+   "description": "severity 20.1% maps to High with base coefficient 0.80",
+   "expected": "High/0.80",
+   "actual": "High/0.80",
+   "passed": true
+  },
+  {
+   "id": "U1.7",
+   "group": "Category mapping",
+   "description": "severity 100.0% maps to High with base coefficient 0.80",
+   "expected": "High/0.80",
+   "actual": "High/0.80",
+   "passed": true
+  },
+  {
+   "id": "U2.1",
+   "group": "Disease factor",
+   "description": "factor for class name 'Bacterial_Blight'",
+   "expected": "1.2",
+   "actual": "1.2",
+   "passed": true
+  },
+  {
+   "id": "U2.2",
+   "group": "Disease factor",
+   "description": "factor for class name 'Blast'",
+   "expected": "1.15",
+   "actual": "1.15",
+   "passed": true
+  },
+  {
+   "id": "U2.3",
+   "group": "Disease factor",
+   "description": "factor for class name 'Brown_Spot'",
+   "expected": "1.0",
+   "actual": "1.0",
+   "passed": true
+  },
+  {
+   "id": "U2.4",
+   "group": "Disease factor",
+   "description": "factor for class name 'Healthy'",
+   "expected": "0.0",
+   "actual": "0.0",
+   "passed": true
+  },
+  {
+   "id": "U2.5",
+   "group": "Disease factor",
+   "description": "factor for class name 'Leaf_Smut'",
+   "expected": "0.8",
+   "actual": "0.8",
+   "passed": true
+  },
+  {
+   "id": "U2.6",
+   "group": "Disease factor",
+   "description": "factor for class name 'Neck_Blast'",
+   "expected": "1.25",
+   "actual": "1.25",
+   "passed": true
+  },
+  {
+   "id": "U2.7",
+   "group": "Disease factor",
+   "description": "factor for class name 'Bacterial leaf blight'",
+   "expected": "1.2",
+   "actual": "1.2",
+   "passed": true
+  },
+  {
+   "id": "U2.8",
+   "group": "Disease factor",
+   "description": "factor for class name 'Healthy Rice Leaf'",
+   "expected": "0.0",
+   "actual": "0.0",
+   "passed": true
+  },
+  {
+   "id": "U2.9",
+   "group": "Disease factor",
+   "description": "factor for class name 'Unknown_Disease'",
+   "expected": "1.0",
+   "actual": "1.0",
+   "passed": true
+  },
+  {
+   "id": "U3.1",
+   "group": "Guards",
+   "description": "severity 1.0% (below 1.5% floor) is treated as Healthy with no spray",
+   "expected": "Healthy/0.0",
+   "actual": "Healthy/0.0",
+   "passed": true
+  },
+  {
+   "id": "U3.2",
+   "group": "Guards",
+   "description": "severity exactly 1.5% is kept as a disease (Low category)",
+   "expected": "Brown_Spot/Low",
+   "actual": "Brown_Spot/Low",
+   "passed": true
+  },
+  {
+   "id": "U3.3",
+   "group": "Guards",
+   "description": "confidence 0.60 is flagged as low confidence",
+   "expected": "True",
+   "actual": "True",
+   "passed": true
+  },
+  {
+   "id": "U3.4",
+   "group": "Guards",
+   "description": "confidence 0.80 is not flagged",
+   "expected": "False",
+   "actual": "False",
+   "passed": true
+  },
+  {
+   "id": "U3.5",
+   "group": "Effective coefficient",
+   "description": "High severity x neck blast factor is clamped to 1.00",
+   "expected": "1.0",
+   "actual": "1.0",
+   "passed": true
+  },
+  {
+   "id": "U3.6",
+   "group": "Effective coefficient",
+   "description": "High severity x bacterial blight (0.80 x 1.20) gives 0.96",
+   "expected": "0.96",
+   "actual": "0.96",
+   "passed": true
+  },
+  {
+   "id": "U3.7",
+   "group": "Effective coefficient",
+   "description": "Low severity x leaf smut (0.30 x 0.80) gives 0.24",
+   "expected": "0.24",
+   "actual": "0.24",
+   "passed": true
+  },
+  {
+   "id": "U3.8",
+   "group": "Effective coefficient",
+   "description": "Healthy leaf gives coefficient 0.00 and category code 0",
+   "expected": "0.0/0",
+   "actual": "0.0/0",
+   "passed": true
+  },
+  {
+   "id": "U4.1",
+   "group": "Spray time",
+   "description": "spray_time(C=0.00) in seconds",
+   "expected": "0.0",
+   "actual": "0.0",
+   "passed": true
+  },
+  {
+   "id": "U4.2",
+   "group": "Spray time",
+   "description": "spray_time(C=0.30) in seconds",
+   "expected": "1.25",
+   "actual": "1.25",
+   "passed": true
+  },
+  {
+   "id": "U4.3",
+   "group": "Spray time",
+   "description": "spray_time(C=0.55) in seconds",
+   "expected": "1.875",
+   "actual": "1.875",
+   "passed": true
+  },
+  {
+   "id": "U4.4",
+   "group": "Spray time",
+   "description": "spray_time(C=0.80) in seconds",
+   "expected": "2.5",
+   "actual": "2.5",
+   "passed": true
+  },
+  {
+   "id": "U4.5",
+   "group": "Spray time",
+   "description": "spray_time(C=1.00) in seconds",
+   "expected": "3.0",
+   "actual": "3.0",
+   "passed": true
+  },
+  {
+   "id": "U4.6",
+   "group": "Spray time",
+   "description": "spray_time(C=1.50) in seconds",
+   "expected": "3.0",
+   "actual": "3.0",
+   "passed": true
+  },
+  {
+   "id": "U4.7",
+   "group": "Spray time",
+   "description": "spray_time(C=-0.20) in seconds",
+   "expected": "0.0",
+   "actual": "0.0",
+   "passed": true
+  },
+  {
+   "id": "U4.8",
+   "group": "Spray time",
+   "description": "spray time never decreases when the coefficient increases",
+   "expected": "True",
+   "actual": "True",
+   "passed": true
+  },
+  {
+   "id": "U4.9",
+   "group": "Spray time",
+   "description": "every non-zero spray time stays inside the 0.5 to 3.0 s window",
+   "expected": "True",
+   "actual": "True",
+   "passed": true
+  },
+  {
+   "id": "U5.1",
+   "group": "Segmentation (colour method)",
+   "description": "leaf mask area is close to the drawn ellipse (pixels)",
+   "expected": "24190",
+   "actual": "24427",
+   "passed": true
+  },
+  {
+   "id": "U5.2",
+   "group": "Segmentation (colour method)",
+   "description": "measured severity matches the drawn brown patch (% of leaf)",
+   "expected": "10.24",
+   "actual": "10.24",
+   "passed": true
+  },
+  {
+   "id": "U5.3",
+   "group": "Segmentation (colour method)",
+   "description": "a plain green leaf gives about 0% severity",
+   "expected": "0.0",
+   "actual": "0.0",
+   "passed": true
+  },
+  {
+   "id": "U6.1",
+   "group": "Output fields",
+   "description": "prediction dictionary carries all ten fields used by the API",
+   "expected": "['base_coefficient', 'category', 'category_code', 'confidence', 'disease_class', 'disease_factor', 'low_confidence', 'note', 'reduction_coefficient', 'severity_percent']",
+   "actual": "['base_coefficient', 'category', 'category_code', 'confidence', 'disease_class', 'disease_factor', 'low_confidence', 'note', 'reduction_coefficient', 'severity_percent']",
+   "passed": true
+  }
+ ]
+}

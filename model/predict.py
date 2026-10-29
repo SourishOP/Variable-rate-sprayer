@@ -103,7 +103,7 @@ def main():
     if not os.path.exists(args.model):
         raise FileNotFoundError(
             f"Model not found: {args.model}\n"
-            "Train first with train_efficientnetv2.py or pass --model."
+            "Train first (see docs/model_run_instructions.md) or pass --model."
         )
 
     pred = predict(args.image, args.model, args.classes)

@@ -1,0 +1,106 @@
+{
+ "total": 13,
+ "passed": 13,
+ "failed": 0,
+ "median_ms": 757.8,
+ "max_ms": 4487.9,
+ "min_ms": 396.1,
+ "cases": [
+  {
+   "id": "I1",
+   "description": "GET /health returns status ok and model mode",
+   "expected": "200, ok, model",
+   "actual": "200, ok, model",
+   "passed": true
+  },
+  {
+   "id": "I2",
+   "description": "health lists the six classes",
+   "expected": "6",
+   "actual": "6",
+   "passed": true
+  },
+  {
+   "id": "I3",
+   "description": "GET / serves the web page",
+   "expected": "200 and html",
+   "actual": "200, text/html",
+   "passed": true
+  },
+  {
+   "id": "I4",
+   "description": "POST /predict without an image is rejected",
+   "expected": "400",
+   "actual": "400",
+   "passed": true
+  },
+  {
+   "id": "I5",
+   "description": "POST /predict with bytes that are not an image is rejected",
+   "expected": "400",
+   "actual": "400",
+   "passed": true
+  },
+  {
+   "id": "I6",
+   "description": "multipart upload of Bacterial_Blight/Bacterial_Blight_02.jpg returns all response fields",
+   "expected": "200 and no missing fields",
+   "actual": "200, missing=[], 4488 ms",
+   "passed": true,
+   "ms": 4487.9
+  },
+  {
+   "id": "I7",
+   "description": "multipart upload of Brown_Spot/Brown_Spot_01.jpg returns all response fields",
+   "expected": "200 and no missing fields",
+   "actual": "200, missing=[], 396 ms",
+   "passed": true,
+   "ms": 396.1
+  },
+  {
+   "id": "I8",
+   "description": "multipart upload of healthy/healthy440.jpg returns all response fields",
+   "expected": "200 and no missing fields",
+   "actual": "200, missing=[], 758 ms",
+   "passed": true,
+   "ms": 757.8
+  },
+  {
+   "id": "I9",
+   "description": "multipart upload of leaf_smut/BLAST8_079.jpg returns all response fields",
+   "expected": "200 and no missing fields",
+   "actual": "200, missing=[], 406 ms",
+   "passed": true,
+   "ms": 405.6
+  },
+  {
+   "id": "I10",
+   "description": "multipart upload of Neck Blast/Neck_Blast_01.jpg returns all response fields",
+   "expected": "200 and no missing fields",
+   "actual": "200, missing=[], 2315 ms",
+   "passed": true,
+   "ms": 2315.3
+  },
+  {
+   "id": "I11",
+   "description": "raw image bytes in the request body are accepted (the form the ESP32-CAM sends)",
+   "expected": "200",
+   "actual": "200",
+   "passed": true
+  },
+  {
+   "id": "I12",
+   "description": "query values A=400, d=20, Qs=4.0 change the per-hill dose a = C x A / (d x 10)",
+   "expected": "0.0",
+   "actual": "0.0",
+   "passed": true
+  },
+  {
+   "id": "I13",
+   "description": "spray_time_s is 0 or inside the 0.5 to 3.0 s window for every sample",
+   "expected": "True",
+   "actual": "True",
+   "passed": true
+  }
+ ]
+}

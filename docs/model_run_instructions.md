@@ -1,31 +1,39 @@
-# Model-Only Run Guide (Train + Predict)
+# Model Run Guide (Train, Predict, Demo)
 
-This guide covers the **software / model** workflow only. No hardware (Arduino,
-ESP32-CAM) is needed. Goal: train an accurate rice-leaf disease classifier, then
-upload one image and get the correct **disease + severity level**.
+This guide covers the software side: training the disease classifier and the
+lesion segmenter, running single-image prediction, and running the web demo.
+The hardware side is documented in [../hardware](../hardware/README.md) and
+[../firmware](../firmware/README.md).
 
-## How it works (two parts)
+## How it works
 
-1. **Disease classification** — `EfficientNetV2-B0` (transfer learning) predicts
-   which disease: `Bacterial_Blight`, `Brown_Spot`, `Healthy`, `Leaf_Smut`.
-2. **Severity measurement (Option B)** — for a diseased leaf, `severity.py`
-   segments the leaf and the lesion pixels with classical computer vision and
-   computes:
+1. **Disease classification.** An `EfficientNetV2-B0` (transfer learning)
+   predicts one of six classes: `Bacterial_Blight`, `Blast`, `Brown_Spot`,
+   `Healthy`, `Leaf_Smut`, `Neck_Blast` (order in `model/class_names.txt`).
+2. **Severity measurement.** `model/severity.py` isolates the leaf and the
+   lesion pixels (trained U-Net lesion segmenter, with a colour-threshold
+   fallback; optional MobileSAM leaf isolation) and computes:
 
    ```
    severity_percent = 100 * diseased_pixels / leaf_pixels
    ```
 
-   Then it maps that to a level:
+   The percentage maps to a level and a base coefficient. A disease-specific
+   factor then scales the dose (see `DISEASE_TREATMENT_FACTOR` in `severity.py`
+   and [../results/RESULTS.md](../results/RESULTS.md) section 4).
 
-   | Severity %      | Level    | Coefficient |
-   |-----------------|----------|-------------|
-   | model = Healthy | Healthy  | 0.00        |
-   | 0.1 – 5%        | Low      | 0.33        |
-   | 5.1 – 20%       | Medium   | 0.67        |
-   | > 20%           | High     | 1.00        |
+   | Severity %      | Level    | Base coefficient |
+   |-----------------|----------|------------------|
+   | model = Healthy | Healthy  | 0.00             |
+   | 0.1 - 5%        | Low      | 0.30             |
+   | 5.1 - 20%       | Medium   | 0.55             |
+   | > 20%           | High     | 0.80             |
 
-This gives a **measured** severity, not a confidence proxy.
+   Severity below 1.5% is treated as Healthy, and classifier confidence below
+   0.70 is flagged as uncertain. Both thresholds are environment-overridable
+   (`MIN_SEVERITY_PERCENT`, `MIN_CONFIDENCE`).
+
+Severity is measured from pixels, not derived from classifier confidence.
 
 ---
 
@@ -33,84 +41,59 @@ This gives a **measured** severity, not a confidence proxy.
 
 | File | Purpose |
 |------|---------|
-| `model/train_efficientnetv2.py` | Train EfficientNetV2-B0 classifier |
-| `model/severity.py`             | Segmentation-based severity + mapping |
-| `model/predict.py`              | Single-image inference (disease + severity) |
-| `model/colab_setup.py`          | Download Kaggle dataset + launch training |
-| `model/requirements.txt`        | Python dependencies |
+| `model/colab_train_merged.py`    | Colab script: merges the UCI paddy set (Kaggle) with an open HuggingFace rice set and trains the 6-class classifier |
+| `model/colab_train_segmenter.py` | Colab script: trains the binary lesion U-Net on PlantSeg |
+| `model/severity.py`              | Segmentation-based severity, dosing and spray-time mapping |
+| `model/predict.py`               | Single-image inference (disease + severity) |
+| `model/class_names.txt`          | Class order used by the classifier |
+| `model/requirements.txt`         | Python dependencies |
+| `notebooks/main_model.ipynb`     | Colab notebook that runs `colab_train_merged.py` |
+| `notebooks/segmenter_model.ipynb`| Colab notebook that runs `colab_train_segmenter.py` |
+
+Trained weights (`*.keras`, `mobile_sam.pt`) are stored with Git LFS. Run
+`git lfs pull` after cloning.
 
 ---
 
-## A. Train in Google Colab (recommended)
+## A. Train the classifier in Google Colab
 
-1. Open [colab.research.google.com](https://colab.research.google.com), new notebook.
-2. Set a GPU runtime: **Runtime → Change runtime type → GPU (T4)**.
-3. Clone or upload this project, then install deps:
+The easiest route is `notebooks/main_model.ipynb`: open it in Colab with a GPU
+runtime (**Runtime > Change runtime type > GPU, T4**) and run the cells.
 
-   ```python
-   !pip install -q -r model/requirements.txt
-   ```
+To run it by hand:
 
-4. Get your Kaggle token: kaggle.com → **Settings → API → Create New API
-   Token**. Newer accounts show a token string starting with `KGAT_`; older
-   accounts download a classic `kaggle.json`. Both work.
-
-   > **Security:** never paste your token into chat, screenshots, or git. If it
-   > leaks, expire it at Kaggle → Settings → API and create a new one.
-
-5. Download the dataset and train in one step.
-
-   New-style token (`KGAT_...`) — set it as an env var so it isn't stored in
-   shell history:
+1. Create a Kaggle token (kaggle.com > **Settings > API > Create New API
+   Token**) and set it in the session. Never commit or paste it anywhere
+   public. If it leaks, expire it in the same settings page.
 
    ```python
    import os
    os.environ["KAGGLE_API_TOKEN"] = "KGAT_...your token..."
-   !python model/colab_setup.py --download --train --epochs 25
    ```
 
-   Classic `kaggle.json` (older accounts) — upload when prompted:
+2. Paste `model/colab_train_merged.py` into a cell with
+   `%%writefile /content/train_merged.py`, then run it:
 
    ```python
-   !python model/colab_setup.py --upload_token --download --train --epochs 25
+   # Optional: merge datasets and print class counts only
+   os.environ["PROBE_ONLY"] = "1"
+   !python /content/train_merged.py
+
+   os.environ["PROBE_ONLY"] = "0"
+   !python /content/train_merged.py
    ```
 
-   This will:
-   - install the Kaggle CLI,
-   - download + unzip the dataset (default:
-     `badhon7432/paddyleafdiseaseuci`),
-   - normalize class folder names to the canonical classes,
-   - launch `train_efficientnetv2.py`.
+   Optional environment variables: `KAGGLE_DATASET` (default
+   `badhon7432/paddyleafdiseaseuci`), `HF_ZIP_URL`, `EPOCHS`, `FT_EPOCHS`,
+   `BATCH`, `OUT_DIR`.
 
-6. Outputs (in `model/` by default):
-   - `rice_disease_effnetv2b0.keras` — the trained model
-   - `rice_disease_effnetv2b0.tflite` — TFLite version
-   - `class_names.txt` — class order
-   - `confusion_matrix.png`, `training_history.png` — evaluation
+3. Download the outputs (`rice_disease_effnetv2b0.keras`, `class_names.txt`)
+   into `model/`.
 
-Download `rice_disease_effnetv2b0.keras` and `class_names.txt` so you can predict
-locally, or keep predicting inside Colab.
-
-### Dataset options
-
-The default dataset is
-[`badhon7432/paddyleafdiseaseuci`](https://www.kaggle.com/datasets/badhon7432/paddyleafdiseaseuci)
-(Paddy Leaf Disease, UCI). To use a different one, pass its slug from the URL
-(`kaggle.com/datasets/<owner>/<name>` → `<owner>/<name>`):
-
-```python
-!python model/colab_setup.py --download --train --dataset <owner>/<name>
-```
-
-The normalizer maps common folder names automatically
-(`Bacterialblight`, `Brown spot`, `Leaf smut`, `Healthy`, etc.) to the canonical
-classes. Any folder it can't map is reported so you can rename it. If a dataset
-has extra disease classes you don't want, delete those folders in
-`/content/rice_dataset` before training, or just let them train as extra classes
-(the code adapts to whatever classes it finds).
+The classifier is trained in two stages (frozen backbone, then fine-tuning)
+with class weights to offset class imbalance.
 
 ---
-
 ## B. Predict on a single image
 
 After training (model + `class_names.txt` present in `model/`):
@@ -129,7 +112,7 @@ Example output:
   "severity_percent": 8.45,
   "category": "Medium",
   "category_code": 2,
-  "reduction_coefficient": 0.67
+  "reduction_coefficient": 0.55
 }
 ```
 

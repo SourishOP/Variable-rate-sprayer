@@ -1,5 +1,6 @@
 # Python virtual environments
 .venv/
+.venv*/
 venv/
 env/
 
@@ -7,13 +8,36 @@ env/
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
-# Jupyter checkpoints
+# Jupyter
 .ipynb_checkpoints/
+
+# Secrets and local configuration (never commit)
+.env
+.env.*
+!.env.example
+secrets.h
+kaggle.json
+*.pem
+
+# Runtime output written by app/server.py
+app/predict_debug.log
+app/last_esp32_frame.png
+*.log
+
+# Office lock/temp files
+~$*
+*.tmp
+
+# Local working folders
+.agents/
+*_archive/
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Editor
 .vscode/
