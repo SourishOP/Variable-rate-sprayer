@@ -106,6 +106,32 @@ def _pil_from_bytes(image_bytes):
     return Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
 
+def _pil_from_rgb565(raw, width, height):
+    """Build an RGB image from a raw big-endian RGB565 frame.
+
+    The ESP32-CAM clone sensor used in this project has no hardware JPEG and
+    the on-device software JPEG encoder exhausts the ESP32's internal RAM, so
+    the firmware ships the raw RGB565 frame instead. Each pixel is 2 bytes,
+    big-endian (the esp32-camera default): RRRRRGGG GGGBBBBB. We expand to 8
+    bits per channel and let PIL take over from there.
+    """
+    import numpy as np
+    from PIL import Image
+
+    expected = width * height * 2
+    if len(raw) < expected:
+        raise ValueError(
+            f"RGB565 body too short: got {len(raw)} bytes, "
+            f"need {expected} for {width}x{height}"
+        )
+    px = np.frombuffer(raw[:expected], dtype=">u2").astype(np.uint32)
+    r = ((px >> 11) & 0x1F) << 3
+    g = ((px >> 5) & 0x3F) << 2
+    b = (px & 0x1F) << 3
+    rgb = np.stack([r, g, b], axis=-1).astype(np.uint8).reshape((height, width, 3))
+    return Image.fromarray(rgb, mode="RGB")
+
+
 def _classify_with_model(pil):
     import numpy as np
     from tensorflow.keras.applications.efficientnet_v2 import preprocess_input
@@ -149,10 +175,25 @@ def _classify_demo(pil, severity_percent):
 
 
 def _extract_image_bytes(req):
-    if "image" in req.files:
+    # Multipart upload (web UI) first.
+    if req.files and "image" in req.files:
         return req.files["image"].read()
-    if req.data:
-        return req.data
+    # Raw body (ESP32 posts application/octet-stream). Read it straight from
+    # the input stream so it works regardless of content type and is not
+    # affected by any earlier access to request.data/form. content_length
+    # tells us how much to read.
+    try:
+        n = req.content_length or 0
+        if n > 0:
+            raw = req.stream.read(n)
+            if raw:
+                return raw
+    except Exception:  # noqa: BLE001
+        pass
+    # Fallbacks.
+    raw = req.get_data(cache=True, as_text=False)
+    if raw:
+        return raw
     return None
 
 
@@ -248,13 +289,52 @@ def predict():
     if _mode is None:
         _try_load_model()
 
+    fmt = (request.args.get("fmt")
+           or request.headers.get("X-Image-Format")
+           or "").lower()
+
+    def _diag(msg):
+        line = f"{msg}\n"
+        try:
+            with open(os.path.join(HERE, "predict_debug.log"), "a") as _f:
+                _f.write(line)
+        except Exception:  # noqa: BLE001
+            pass
+        print(line, end="", flush=True)
+
+    # Read the body BEFORE touching request.data/form, so the input stream is
+    # not consumed out from under us.
     image_bytes = _extract_image_bytes(request)
+
+    _diag(f"[predict] from={request.remote_addr} fmt={fmt!r} "
+          f"args={dict(request.args)} content_length={request.content_length} "
+          f"extracted={len(image_bytes) if image_bytes else 0}")
+
     if not image_bytes:
+        _diag("[predict] 400: no image bytes extracted")
         return jsonify({"error": "no image provided"}), 400
 
+    # Raw RGB565 path: the ESP32-CAM firmware sends the raw frame (no JPEG)
+    # when it declares format=rgb565 with width/height, either as query params
+    # (?fmt=rgb565&w=160&h=120) or the X-Image-Format / X-Image-Width /
+    # X-Image-Height headers. Everything else is treated as an encoded image
+    # (JPEG/PNG) exactly as before.
     try:
-        pil = _pil_from_bytes(image_bytes)
+        if fmt in ("rgb565", "raw565"):
+            w = int(request.args.get("w") or request.headers.get("X-Image-Width"))
+            h = int(request.args.get("h") or request.headers.get("X-Image-Height"))
+            _diag(f"[predict] rgb565 decode w={w} h={h} bytes={len(image_bytes)}")
+            pil = _pil_from_rgb565(image_bytes, w, h)
+            # Debug aid: keep the last frame the ESP32 sent so colours / framing
+            # can be checked by eye (wrong byte order would swap colours).
+            try:
+                pil.save(os.path.join(HERE, "last_esp32_frame.png"))
+            except Exception as save_err:  # noqa: BLE001
+                print(f"[server] could not save debug frame: {save_err}")
+        else:
+            pil = _pil_from_bytes(image_bytes)
     except Exception as e:  # noqa: BLE001
+        _diag(f"[predict] 400: decode failed: {e}")
         return jsonify({"error": f"could not decode image: {e}"}), 400
 
     # Optional leaf isolation. A free-form 'polygon' (traced outline) takes
@@ -290,12 +370,20 @@ def predict():
     a_ml_per_hill = (pred.reduction_coefficient * app_rate) / (hill_density * 10.0)
     ts = sev.spray_time(pred.reduction_coefficient, app_rate, hill_density, flow_rate)
 
-    # Overlay PNG.
-    try:
-        overlay_b64 = sev.overlay_png_base64(pil, box=box, polygon=polygon)
-    except Exception as e:  # noqa: BLE001
+    # Overlay PNG. The web UI wants it, but the ESP32 does not and cannot hold
+    # the large base64 string (its JSON buffer overflows -> NoMemory). Clients
+    # can skip it with ?overlay=0 (the firmware does this); it is also skipped
+    # automatically for the raw RGB565 path.
+    want_overlay = (request.args.get("overlay", "1") != "0") and fmt not in (
+        "rgb565", "raw565")
+    if want_overlay:
+        try:
+            overlay_b64 = sev.overlay_png_base64(pil, box=box, polygon=polygon)
+        except Exception as e:  # noqa: BLE001
+            overlay_b64 = None
+            print(f"[server] overlay generation failed: {e}")
+    else:
         overlay_b64 = None
-        print(f"[server] overlay generation failed: {e}")
 
     result = pred.to_dict()
     result.update({
