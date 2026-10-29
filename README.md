@@ -15,6 +15,7 @@ Capstone project BCE497J / BCSE497J, SCOPE, VIT Chennai. Authors: Sourish Das
 - [Results](#results)
 - [Repository layout](#repository-layout)
 - [Quick start](#quick-start)
+  - [Run the real backend for ESP32-CAM images](#run-the-real-backend-for-esp32-cam-images)
 - [Hardware](#hardware)
 - [Rebuilding the report](#rebuilding-the-report)
 - [Project status and limitations](#project-status-and-limitations)
@@ -129,6 +130,87 @@ Without a model file the server starts in demo mode (heuristic disease label,
 but severity is still measured from the mask). To train the models, open the
 notebooks in [notebooks/](notebooks/README.md) on Google Colab with a GPU.
 
+### Run the real backend for ESP32-CAM images
+
+The web demo above is for uploading photos by hand. To receive and classify the
+pictures that the ESP32-CAM captures, run the same backend (`app/server.py`) on a
+computer that the ESP32 can reach over Wi-Fi. The server listens on all network
+interfaces (`0.0.0.0`, port 5000), so no code change is needed. The tested setup is
+a PC and the ESP32-CAM on the same network, for example a phone hotspot.
+
+1. **Get the real models.** Run `git lfs pull`, then check that
+   `model/rice_disease_effnetv2b0.keras` is a large file (about 41 MB), not a
+   small text pointer. Install the dependencies as in the steps above.
+
+2. **Start the server.**
+
+   ```bash
+   python app/server.py
+   ```
+
+   Use `PORT=8000 python app/server.py` (Linux/macOS) or
+   `$env:PORT = "8000"; python app/server.py` (PowerShell) to change the port.
+
+3. **Check that it runs in model mode.** Open <http://127.0.0.1:5000/health>. It
+   must report `"model_loaded": true` and `"mode": "model"`. If it says
+   `"demo"`, the classifier file is missing and ESP32 results will not be real.
+
+4. **Find the computer's IP address on the shared network.**
+   Windows: `ipconfig` (IPv4 Address of the Wi-Fi adapter).
+   Linux/macOS: `ip addr` or `ifconfig`. Use this address, not `localhost`.
+
+5. **Allow the port through the firewall.** On Windows, run once in an
+   administrator PowerShell, otherwise the ESP32 cannot connect:
+
+   ```powershell
+   New-NetFirewallRule -DisplayName "PaddyGuard Flask 5000" -Direction Inbound -Protocol TCP -LocalPort 5000 -Action Allow -Profile Private
+   ```
+
+   Mark the Wi-Fi network as Private, or add `Public` to `-Profile` if you
+   must use a public profile. On Linux: `sudo ufw allow 5000/tcp`.
+
+6. **Test from another device** on the same network (a phone browser works):
+   `http://<computer-ip>:5000/health` should return the same JSON.
+
+7. **Point the ESP32-CAM at the server.** Copy
+   `firmware/esp32cam_sprayer/secrets.h.example` to `secrets.h` and set
+   `WIFI_SSID`, `WIFI_PASSWORD` and
+   `PREDICT_URL "http://<computer-ip>:5000/predict"`. Flash the sketch (see
+   [firmware/README.md](firmware/README.md)). If the computer's IP changes
+   (reconnect or reboot), update `PREDICT_URL` and flash again.
+
+8. **Trigger a capture.** Press the push button on GPIO13 (or the Blynk button
+   if enabled). The ESP32 sends one raw RGB565 frame (320x240) to
+   `POST /predict?fmt=rgb565&overlay=0&w=320&h=240` and waits for the JSON
+   reply. In the server terminal you should see a `[predict] from=<esp-ip> ...`
+   line for each capture.
+
+What the server does with each frame, and what you can inspect:
+
+| Item | Where |
+|------|-------|
+| Request log (client IP, format, byte count, decode errors) | server terminal and `app/predict_debug.log` |
+| Last frame received from the ESP32, to check framing and colours | `app/last_esp32_frame.png` |
+| Reply used by the ESP32 | `disease_class`, `confidence`, `severity_percent`, `category_code`, `spray_time_s` (JSON) |
+| Valve command sent on to the Nano | `S<ms>,<cat>*<HH>` over serial, `<ms>` is `spray_time_s` in milliseconds |
+
+Common problems:
+
+| Symptom | Likely cause |
+|---------|--------------|
+| ESP32 prints connection or timeout errors | Wrong IP in `PREDICT_URL`, different network, or the firewall rule is missing |
+| Nothing appears in the server terminal | The request never arrived, test `http://<computer-ip>:5000/health` from a phone |
+| HTTP 400 `could not decode image` | Body size does not match `w` x `h` x 2 bytes, check the sketch frame size |
+| Colours look swapped in `last_esp32_frame.png` | RGB565 byte order mismatch between firmware and server |
+| Results always look like a demo | `/health` shows `"mode": "demo"`, run `git lfs pull` |
+| First reply is slow | TensorFlow and the models load on first use. In the recorded API tests the median reply took about 0.76 s and the slowest 4.5 s (`report/content/api_test_results.json`) |
+
+The server has no authentication. Run it only on a trusted local network, not
+on the open internet. The tested path is plain HTTP on a local network. Hosting
+the backend on Colab behind an ngrok HTTPS URL (`app/launch_colab.py`) works for
+the web UI, but the current ESP32 sketch posts over plain HTTP and would need
+changes for HTTPS.
+
 ## Hardware
 
 AI-Thinker ESP32-CAM (capture and Wi-Fi), Arduino Nano (valve timing), 5 V
@@ -136,7 +218,7 @@ relay module, 12 V normally-closed solenoid valve, 12 V diaphragm pump, LM2596
 buck converter, spray nozzle and silicone tubing. Planned budget is about
 Rs. 2,250 to 2,400. The wiring, build phases and bill of materials are in
 [hardware/hardware_implementation_plan.md](hardware/hardware_implementation_plan.md).
-To flash the boards, copy `firmware/esp32cam_sprayer/secrets.h.example` to
+The ESP32 needs the backend running, see [Run the real backend for ESP32-CAM images](#run-the-real-backend-for-esp32-cam-images). To flash the boards, copy `firmware/esp32cam_sprayer/secrets.h.example` to
 `secrets.h`, fill it in, and follow [firmware/README.md](firmware/README.md).
 
 ## Rebuilding the report

@@ -21,6 +21,10 @@ firmware/esp32cam_sprayer/secrets.h.example  ->  copy to secrets.h and fill in
 Blynk values are only needed if you set `BLYNK_ENABLED` to 1 in the sketch; it is
 0 by default.
 
+## Backend
+
+The ESP32-CAM posts each capture to `app/server.py`, which must be running and reachable at `PREDICT_URL` before you press the trigger. See [Run the real backend for ESP32-CAM images](../README.md#run-the-real-backend-for-esp32-cam-images).
+
 ## Flash
 
 - Toolchain used: arduino-esp32 core 2.0.17, ArduinoJson 7.4.3, Blynk 1.4.0

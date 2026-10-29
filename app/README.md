@@ -24,6 +24,10 @@ python app/server.py          # open http://127.0.0.1:5000
 `spray_time_s`, `spray_params` and a base64 `overlay_png`. The ESP32-CAM sends
 raw RGB565 frames with `?fmt=rgb565&w=<w>&h=<h>`.
 
+## Receiving images from the ESP32-CAM
+
+The same command serves the ESP32-CAM. The server listens on `0.0.0.0` (all interfaces), port 5000, so the board can reach it at `http://<computer-ip>:5000/predict` if both are on the same network and the firewall allows TCP 5000. Check `/health` shows `mode: model` first. The full step-by-step setup, firewall command and troubleshooting table are in the [main README](../README.md#run-the-real-backend-for-esp32-cam-images).
+
 ## Modes
 
 - **model**: `model/rice_disease_effnetv2b0.keras` is found and used.
